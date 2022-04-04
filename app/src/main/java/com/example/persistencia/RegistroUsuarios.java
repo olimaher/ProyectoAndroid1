@@ -14,8 +14,8 @@ import android.widget.Toast;
 
 public class RegistroUsuarios extends AppCompatActivity {
 
-    EditText documento, nombre;
-    Button regresar;
+    EditText documento, nombre, clave;
+
 
 
     @Override
@@ -25,21 +25,15 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         documento = findViewById(R.id.txtDocumento);
         nombre = findViewById(R.id.txtNombre);
-        regresar = findViewById(R.id.btnRegresar);
+        clave = findViewById(R.id.txtpassword);
 
-        regresar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intRegresar = new Intent(RegistroUsuarios.this,MenuOpciones.class);
-                startActivity(intRegresar);
-            }
-        });
+
 
     }
 
-    public void registrar(View view){ //Otra forma de configurar un boton.
+    public void registrar(View view) { //Otra forma de configurar un boton.
 
-        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(),"Universidad",1);
+        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(), "Universidad", 1);
 
         SQLiteDatabase db = dataBase.getWritableDatabase();
 
@@ -48,52 +42,97 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         ContentValues valores = new ContentValues();
         valores.put("doc", doc);
-        valores.put("nombre",nom);
+        valores.put("nombre", nom);
 
-        long newRorId = db.insert("estudiantes",null,valores);
+        long newRorId = db.insert("estudiantes", null, valores);
 
         documento.setText("");
         nombre.setText("");
 
-        if (newRorId ==-1){
-            Toast.makeText(this,"No se puedo guardar en la base de datos",Toast.LENGTH_LONG).show();
-        }
-        else   {
-            Toast.makeText(this,"Datos guardados satisfactoriamente", Toast.LENGTH_LONG).show();
+        if (newRorId == -1) {
+            Toast.makeText(this, "No se puedo guardar en la base de datos", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Datos guardados satisfactoriamente", Toast.LENGTH_LONG).show();
         }
     }
-    public void actualizar (View view){
 
-        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(),"Universidad",1);
+    public void actualizar(View view) {
+
+        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(), "Universidad", 1);
 
         SQLiteDatabase db = dataBase.getWritableDatabase();
 
+        String doc = documento.getText().toString();
+        String nom = nombre.getText().toString();
+
+        if (!doc.isEmpty()) {
+            ContentValues valActualizar = new ContentValues();
+            valActualizar.put("nombre", nom);
+            int idActualizar = db.update("estudiantes", valActualizar, "doc=" + doc, null);
+
+            if (idActualizar != 0) {
+                Toast.makeText(this, "Usuario Actualizado con exito", Toast.LENGTH_LONG).show();
+
+            } else {
+                Toast.makeText(this, "El usuario no existe", Toast.LENGTH_LONG).show();
+            }
+
+        } else {
+            Toast.makeText(this, "Ingrese el documento a actualizar", Toast.LENGTH_LONG).show();
+
+        }
+
+        documento.setText("");
+        nombre.setText("");
     }
-    public void consultar (View view){
-        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(),"Universidad",1);
+
+    public void consultar(View view) {
+
+        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(), "Universidad", 1);
 
         SQLiteDatabase db = dataBase.getWritableDatabase();
 
         String id = documento.getText().toString();
 
-        if(!id.isEmpty()){
-            Cursor fila = db.rawQuery("select * from estudiantes where doc =" +id,null);
-            if (fila.moveToFirst()){
+        if (!id.isEmpty()) {
+            Cursor fila = db.rawQuery("select * from estudiantes where doc =" + id, null);
+            if (fila.moveToFirst()) {
                 nombre.setText(fila.getString(1));
-            }else{
+            } else {
                 documento.setText("");
                 nombre.setText((""));
-                Toast.makeText(getApplicationContext(),"Este número de identificación no existe",Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Este número de identificación no existe", Toast.LENGTH_LONG).show();
             }
-        }else  {
-            Toast.makeText(getApplicationContext(),"Ingrese un número de documento para la busqueda",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Ingrese un número de documento para la busqueda", Toast.LENGTH_LONG).show();
         }
     }
-    public void eliminar (View view){
 
-        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(),"Universidad",1);
+    public void eliminar(View view) {
+
+        AdminDataBase dataBase = new AdminDataBase(getApplicationContext(), "Universidad", 1);
 
         SQLiteDatabase db = dataBase.getWritableDatabase();
 
+        String id = documento.getText().toString();
+
+        if (!id.isEmpty()) {
+
+            int idEliminar = db.delete("estudiantes", "doc=" + id, null);
+
+            if (idEliminar != 0) {
+                Toast.makeText(this, "Usuario eliminado con exito", Toast.LENGTH_LONG).show();
+                documento.setText("");
+                nombre.setText("");
+            } else {
+                documento.setText("");
+                nombre.setText("");
+                Toast.makeText(this, "El usuario no existe", Toast.LENGTH_LONG).show();
+            }
+
+        } else {
+
+            Toast.makeText(getApplicationContext(), "Ingrese el documento a eliminar", Toast.LENGTH_LONG).show();
+        }
     }
 }
