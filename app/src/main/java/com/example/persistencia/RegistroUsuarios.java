@@ -39,21 +39,28 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         String doc = documento.getText().toString();
         String nom = nombre.getText().toString();
+        String pass = clave.getText().toString();
+
+
 
         ContentValues valores = new ContentValues();
         valores.put("doc", doc);
-        valores.put("nombre", nom);
+        valores.put("username", nom);
+        valores.put("password",pass);
 
-        long newRorId = db.insert("estudiantes", null, valores);
 
-        documento.setText("");
-        nombre.setText("");
+
+        long newRorId = db.insert("usuarios", null, valores);
 
         if (newRorId == -1) {
             Toast.makeText(this, "No se puedo guardar en la base de datos", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "Datos guardados satisfactoriamente", Toast.LENGTH_LONG).show();
         }
+        documento.setText("");
+        nombre.setText("");
+        clave.setText("");
+
     }
 
     public void actualizar(View view) {
@@ -64,11 +71,13 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         String doc = documento.getText().toString();
         String nom = nombre.getText().toString();
+        String pass = clave.getText().toString();
 
         if (!doc.isEmpty()) {
             ContentValues valActualizar = new ContentValues();
-            valActualizar.put("nombre", nom);
-            int idActualizar = db.update("estudiantes", valActualizar, "doc=" + doc, null);
+            valActualizar.put("username", nom);
+            valActualizar.put("password",pass);
+            int idActualizar = db.update("usuarios", valActualizar, "doc=" + doc, null);
 
             if (idActualizar != 0) {
                 Toast.makeText(this, "Usuario Actualizado con exito", Toast.LENGTH_LONG).show();
@@ -81,9 +90,6 @@ public class RegistroUsuarios extends AppCompatActivity {
             Toast.makeText(this, "Ingrese el documento a actualizar", Toast.LENGTH_LONG).show();
 
         }
-
-        documento.setText("");
-        nombre.setText("");
     }
 
     public void consultar(View view) {
@@ -95,7 +101,7 @@ public class RegistroUsuarios extends AppCompatActivity {
         String id = documento.getText().toString();
 
         if (!id.isEmpty()) {
-            Cursor fila = db.rawQuery("select * from estudiantes where doc =" + id, null);
+            Cursor fila = db.rawQuery("select * from usuarios where doc =" + id, null);
             if (fila.moveToFirst()) {
                 nombre.setText(fila.getString(1));
             } else {
@@ -118,7 +124,7 @@ public class RegistroUsuarios extends AppCompatActivity {
 
         if (!id.isEmpty()) {
 
-            int idEliminar = db.delete("estudiantes", "doc=" + id, null);
+            int idEliminar = db.delete("usuarios", "doc=" + id, null);
 
             if (idEliminar != 0) {
                 Toast.makeText(this, "Usuario eliminado con exito", Toast.LENGTH_LONG).show();
